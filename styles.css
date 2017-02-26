@@ -1,5 +1,8 @@
+#grid {
+  background: rgba(11, 8, 17, 0.97);
+}
 h1 {
-  color: #369;
+  color: rgba(212, 245, 213, 0.02);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 250%;
 }
