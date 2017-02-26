@@ -8,12 +8,13 @@ import {UserComponent} from "./components/user.component";
 import {AboutComponent} from "./components/about.component";
 import {AgGridModule} from "ag-grid-ng2/main";
 import {routing} from "./app.routing";
+import {QuizGridComponent} from "./components/quiz.component";
 // import {GridOptions} from "ag-grid";
 
 @NgModule({
   imports: [BrowserModule, FormsModule, HttpModule, routing, AgGridModule.withComponents([])
   ],
-  declarations: [AppComponent, UserComponent, AboutComponent, UserGridComponent],
+  declarations: [AppComponent, UserComponent, AboutComponent, UserGridComponent, QuizGridComponent],
   bootstrap:    [ AppComponent ]
 })
 export class AppModule { }

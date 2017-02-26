@@ -3,6 +3,7 @@ import {Routes, RouterModule} from "@angular/router";
 import {UserComponent} from "./components/user.component";
 import {AboutComponent} from "./components/about.component";
 import {UserGridComponent} from "./components/user.grid.component";
+import {QuizGridComponent} from "./components/quiz.component";
 
 const appRoutes: Routes = [
   {
@@ -16,6 +17,10 @@ const appRoutes: Routes = [
   {
     path: 'usergrid',
     component: UserGridComponent
+  },
+  {
+    path: 'quizgrid',
+    component: QuizGridComponent
   }
 
 ];
