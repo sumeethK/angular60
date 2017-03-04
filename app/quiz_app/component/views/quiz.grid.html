@@ -1,0 +1,52 @@
+<div id="quiz-grid"><h1>Gridtest</h1>
+  <button (click)="validateAnswer()">validate</button>
+  <ag-grid-ng2 #agGrid style="width: 100%; height: 350px;" class="ag-dark"
+               [gridOptions]="gridOptions"
+               [columnDefs]="columnDefs"
+               [showToolPanel]="showToolPanel"
+               [rowData]="rowData"
+               enableColResize
+               enableSorting
+               enableFilter
+               groupHeaders
+               suppressRowClickSelection
+               toolPanelSuppressGroups
+               toolPanelSuppressValues
+               debug
+               rowHeight="22"
+               rowSelection="multiple"
+
+               rowModelType="pagination"
+
+               (modelUpdated)="onModelUpdated()"
+               (cellClicked)="onCellClicked($event)"
+               (cellDoubleClicked)="onCellDoubleClicked($event)"
+               (cellContextMenu)="onCellContextMenu($event)"
+               (cellValueChanged)="onCellValueChanged($event)"
+               (cellFocused)="onCellFocused($event)"
+               (rowSelected)="onRowSelected($event)"
+               (selectionChanged)="onSelectionChanged()"
+               (beforeFilterChanged)="onBeforeFilterChanged()"
+               (afterFilterChanged)="onAfterFilterChanged()"
+               (filterModified)="onFilterModified()"
+               (beforeSortChanged)="onBeforeSortChanged()"
+               (afterSortChanged)="onAfterSortChanged()"
+               (virtualRowRemoved)="onVirtualRowRemoved($event)"
+               (rowClicked)="onRowClicked($event)"
+               (gridReady)="onReady($event)"
+
+               (columnEverythingChanged)="onColumnEvent($event)"
+               (columnRowGroupChanged)="onColumnEvent($event)"
+               (columnValueChanged)="onColumnEvent($event)"
+               (columnMoved)="onColumnEvent($event)"
+               (columnVisible)="onColumnEvent($event)"
+               (columnGroupOpened)="onColumnEvent($event)"
+               (columnResized)="onColumnEvent($event)"
+               (columnPinnedCountChanged)="onColumnEvent($event)"
+
+               (cellEditingStarted)="onCellEditingStarted($event)"
+               (cellEditingStopped)="onCellEditingStopped($event)"
+               (rowEditingStarted)="onRowEditingStarted($event)"
+               (rowEditingStopped)="onRowEditingStopped($event)">
+  </ag-grid-ng2>
+</div>

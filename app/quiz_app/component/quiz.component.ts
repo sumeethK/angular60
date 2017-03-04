@@ -1,8 +1,8 @@
 import {Component, OnInit} from "@angular/core";
 import {AgGridNg2} from "ag-grid-ng2/main";
 import {GridOptions} from "ag-grid";
-import {QuizService} from "../services/quiz.service";
-declare var $: any;
+import {QuizService} from "../../services/quiz.service";
+declare let $: any;
 
 @Component({
   moduleId: module.id,

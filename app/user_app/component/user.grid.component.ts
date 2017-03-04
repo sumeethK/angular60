@@ -1,23 +1,21 @@
 import {Component, OnInit} from "@angular/core";
+import {User, Address} from "./interface/user.interface";
 import {AgGridNg2} from "ag-grid-ng2/main";
 import {GridOptions} from "ag-grid";
-import {QuizService} from "../services/quiz.service";
-declare var $: any;
+import {PostsService} from "../../services/posts.service";
+
 
 @Component({
   moduleId: module.id,
-  selector: 'quizgrid',
+  selector: 'usergrid',
   directives: [AgGridNg2],
-  templateUrl: './views/quiz.grid.html',
-  providers: [QuizService]
+  templateUrl: './views/user.grid.html',
+  providers: [PostsService]
 })
-export class QuizGridComponent implements OnInit {
-  private questions: Question[];
-  private quizData: any;
+export class UserGridComponent implements OnInit {
+  private users: User[];
   public showGrid: boolean;
   public rowData: any[];
-  private selectedOptions: any[];
-  private answerCode: any[];
   private columnDefs: any[];
   private gridOptions: GridOptions;
   public rowCount: string;
@@ -25,14 +23,13 @@ export class QuizGridComponent implements OnInit {
   ngOnInit() {
   }
 
-  constructor(private quizService: QuizService) {
+  constructor(private postsService: PostsService) {
 
     // we pass an empty gridOptions in, so we can grab the api out
     this.gridOptions = <GridOptions>{};
     this.createRowData();
     this.createColumnDefs();
     this.showGrid = true;
-    this.selectedOptions = [];
     this.gridOptions.defaultColDef = {
       headerComponentParams: {
         menuIcon: 'fa-bars'
@@ -44,12 +41,9 @@ export class QuizGridComponent implements OnInit {
 
   private createRowData() {
     this.rowData = [];
-    this.quizService.getQuestion().subscribe(questionList => {
-      this.quizData = questionList;
-      this.questions = this.quizData["questionList"];
-      this.rowData = this.questions;
-      this.rowData = addDefaultSelectedOption(this.rowData);
-      this.answerCode = fetchAnswer(this.rowData);
+    this.postsService.getUsers().subscribe(users => {
+      this.users = users;
+      this.rowData = this.users;
       var dataSource = {
         paginationPageSize: 10,
         overflowSize: 100,
@@ -70,64 +64,52 @@ export class QuizGridComponent implements OnInit {
         colIndex: 1
       },
       {
-        headerName: "Question Category",
-        field: "category.description",
+        headerName: "Name",
+        field: "name",
         width: 120,
         filter: 'text',
         colIndex: 2
       },
       {
-        headerName: "Question",
-        field: "question",
-        width: 220,
+        headerName: "Username",
+        field: "username",
+        width: 120,
         filter: 'text',
-        colIndex: 3
+        colIndex: 3,
+        editable: true
       },
       {
-        headerName: "Option 1",
-        field: "options.a",
+        headerName: "Email",
+        field: "email",
         width: 120,
         filter: 'text',
         colIndex: 4
       },
       {
-        headerName: "Option 2",
-        field: "options.b",
+        headerName: "Phone",
+        field: "phone",
         width: 120,
         filter: 'text',
         colIndex: 5
       },
       {
-        headerName: "Option 3",
-        field: "options.c",
+        headerName: "Website",
+        field: "website",
         width: 120,
         filter: 'text',
         colIndex: 6
       },
       {
-        headerName: "Option 4",
-        field: "options.d",
+        headerName: "Address",
+        field: "address",
+        cellRenderer: addressRender,
         width: 120,
         filter: 'text',
         colIndex: 7
-      },
-      {
-        headerName: "Selected Option",
-        field: "optionSelected",
-        width: 120,
-        filter: 'text',
-        colIndex: 8,
-        cellStyle: this.changeRowColor
-        // cellRenderer: selectedOption,
       }
     ];
   }
 
-  private changeRowColor(param) {
-    if (param.node.data[4] === 100) {
-      return {'background-color': 'yellow'};
-    }
-  }
 
   private calculateRowCount() {
     if (this.gridOptions.api && this.rowData) {
@@ -151,19 +133,6 @@ export class QuizGridComponent implements OnInit {
 
   private onCellClicked($event) {
     console.log('onCellClicked: ' + $event.rowIndex + ' ' + $event.colDef.field);
-    if ($event.column.colId.length > 0 && $event.column.colId.includes("options.")) {
-      this.onOptionSelected($event);
-    }
-  }
-
-  private onOptionSelected($event) {
-    var option = $event.column.colId.split(".")[1].toUpperCase();
-    this.selectedOptions[$event.rowIndex] = option;
-    this.rowData[$event.rowIndex]["optionSelected"] = option;
-    // this.gridOptions.api.setRowData(this.rowData);
-    this.gridOptions.api.refreshView();
-    console.log("Option selected:" + option);
-    console.log(this.selectedOptions);
   }
 
   private onCellValueChanged($event) {
@@ -180,9 +149,6 @@ export class QuizGridComponent implements OnInit {
 
   private onCellFocused($event) {
     console.log('onCellFocused: (' + $event.rowIndex + ',' + $event.column.colId + ')');
-    if ($event.column.colId.length > 0 && $event.column.colId.includes("options.")) {
-      this.onOptionSelected($event);
-    }
   }
 
   private onRowSelected($event) {
@@ -221,7 +187,7 @@ export class QuizGridComponent implements OnInit {
   }
 
   private onRowClicked($event) {
-    console.log('onRowClicked: ' + $event.rowIndex);
+    console.log('onRowClicked: ' + $event.node.data.name);
   }
 
   public onQuickFilterChanged($event) {
@@ -251,23 +217,6 @@ export class QuizGridComponent implements OnInit {
     console.log('cellEditingStopped');
   }
 
-  public validateAnswer() {
-    console.log("validation");
-    var dataSelectedOptions = this.selectedOptions;
-    var countCorrectAnswer = 0;
-    if (dataSelectedOptions.length > 0) {
-      var localGrid = this.gridOptions;
-
-      var dataAnswerCode = this.answerCode;
-      $.each(dataSelectedOptions, function (index, value) {
-        if (dataSelectedOptions[index] == dataAnswerCode[index]) {
-          countCorrectAnswer++;
-        }
-      });
-    }
-    console.log("Total Correct Answers :" + countCorrectAnswer);
-  }
-
 
 }
 
@@ -283,10 +232,13 @@ function createRandomPhoneNumber() {
   return result;
 }
 
-// function selectedOption(param) {
-//
-//   return "Street : " + address.data.address.street + "\n" +
-// }
+function addressRender(address) {
+  return "Street : " + address.data.address.street + "\n" +
+  "City : " + address.data.address.city + "\n" +
+  "Suite : " + address.data.address.suite + "\n",
+  "Zipcode : " + address.data.address.zipcode + "\n",
+  "Lat : " + address.data.address.geo.lat + "\n";
+}
 
 function percentCellRenderer(params) {
   var value = params.value;
@@ -314,22 +266,11 @@ function percentCellRenderer(params) {
   return eOuterDiv;
 }
 
-function addDefaultSelectedOption(data) {
-  // var option = ["A","B","C","D"]
-  $.each(data, function (index, value) {
-    // var random= Math.floor((Math.random()*option.length))
-    data[index]["optionSelected"] = "None";
-    console.log(data[index]["optionSelected"]);
-  });
-  return data;
-}
-function fetchAnswer(data) {
-  var answerCode = [];
-  $.each(data, function (index, value) {
-    answerCode[index] = data[index]["answer"]["key"];
-  });
-  console.log("AnswerCode:" + answerCode);
-  return answerCode;
+//Utility function used to pad the date formatting.
+function pad(num, totalStringSize) {
+  let asString = num + "";
+  while (asString.length < totalStringSize) asString = "0" + asString;
+  return asString;
 }
 
 

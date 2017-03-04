@@ -1,0 +1,37 @@
+<button (click)="toggleHobbies()">{{showHobbies ? "Hide Hobbies" : "Show Hobbies"}}</button>
+<div *ngIf="showHobbies">
+  <h3>Hobbies</h3>
+  <ul>
+    <li *ngFor="let hobby of hobbies; let i = index">
+      {{hobby}}
+      <button (click)="deleteHobby(i)">X</button>
+    </li>
+  </ul>
+  <form (submit)="addHobby(hobby.value)">
+    <label>Add Hobby: </label><br/>
+    <input type="text" #hobby/><br/>
+  </form>
+</div>
+<hr/>
+<hr/>
+<h3>Users</h3>
+<ol>
+  <li *ngFor="let user of users">
+    <div>
+      <h4>{{user.name}}</h4>
+      Username: <span>{{user.username}}</span><br>
+      Email: <span>{{user.email}}</span><br>
+      Street:<span>{{user.address.street}}</span><br>
+      Suite: <span>{{user.address.suite}}</span><br>
+      City:<span>{{user.address.city}}</span><br>
+      Geo.latitude:<span>{{user.address.geo.lat}}</span><br>
+      Geo.longitude:<span>{{user.address.geo.lng}}</span><br>
+      Phone <span> {{user.phone}}</span><br>
+      Website<span> {{user.website}}</span><br>
+      Company Name: <span>{{user.company.name}}</span><br>
+      Company Cp: <span>{{user.company.catchPhrase}}</span><br>
+      Company Bs: <span>{{user.company.bs}}</span><br>
+
+    </div>
+  </li>
+</ol>
