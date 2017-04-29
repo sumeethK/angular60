@@ -1,36 +1,47 @@
 import {Component, NgModule, OnInit} from "@angular/core";
-import {PostsService} from "../services/posts.service";
-import {Address, User} from "./interface/user.interface";
 import {AgGridNg2} from "ag-grid-ng2/main";
 import {GridOptions} from "ag-grid";
-
+import {MovieService} from "../../services/movie.service";
+declare let $: any;
 @NgModule({
   declarations: [AgGridNg2]
 })
 @Component({
   moduleId: module.id,
-  selector: 'usergrid',
-  templateUrl: './views/user.grid.html',
-  providers: [PostsService]
+  selector: 'movie-grid',
+  templateUrl: './views/movie.grid.html',
+  providers: [MovieService]
 })
-export class UserGridComponent implements OnInit {
-  gridOptions: GridOptions;
-  private users: User[];
+export class MovieGridComponent implements OnInit {
+  private moviesList: Movie[];
+  private moviesData: any;
+  private totalMovies: number;
   public showGrid: boolean;
   public rowData: any[];
+  private selectedOptions: any[];
+  private answerCode: any[];
   private columnDefs: any[];
+  private currentPage: number;
+  private pageLimit: number;
+  private pageOffset: number;
+  private gridOptions: GridOptions;
   public rowCount: string;
 
   ngOnInit() {
   }
 
-  constructor(private postsService: PostsService) {
+  constructor(private movieService: MovieService) {
 
     // we pass an empty gridOptions in, so we can grab the api out
     this.gridOptions = <GridOptions>{};
+    this.currentPage = 0;
+    this.pageLimit = 100;
+    this.pageOffset = (this.currentPage * this.pageLimit);
     this.createRowData();
+    // this.updataDataSource();
     this.createColumnDefs();
     this.showGrid = true;
+    this.selectedOptions = [];
     this.gridOptions.defaultColDef = {
       headerComponentParams: {
         menuIcon: 'fa-bars'
@@ -40,21 +51,48 @@ export class UserGridComponent implements OnInit {
 
   }
 
+
   private createRowData() {
     this.rowData = [];
-    this.postsService.getUsers().subscribe(users => {
-      this.users = users;
-      this.rowData = this.users;
-      var dataSource = {
-        paginationPageSize: 10,
-        overflowSize: 100,
-        getRows: (params: any) => {
-          params.successCallback(this.rowData, -1);
-        }
-      };
-      this.gridOptions.api.setDatasource(dataSource);
-      console.log("Rowdata :" + dataSource);
+    this.movieService.getMoviesWithLimitAndOffset(this.pageLimit, this.pageOffset).subscribe(moviesList => {
+      this.moviesData = moviesList;
+      this.moviesList = this.moviesData["moviesList"];
+      this.rowData = this.moviesList;
+      this.totalMovies = this.moviesData["total_movies"];
+      this.updateGrid();
     });
+  }
+
+  private updateGrid() {
+    var dataSource = {
+      startRow: 0,
+      endRow: 10,
+      paginationFirstPage: 20,
+      paginationPageSize: 10,
+      overflowSize: 10,
+      getRows: (params: any) => {
+        params.successCallback(this.rowData, this.totalMovies);
+        console.log("dataSource :" + dataSource);
+      }
+    };
+    this.gridOptions.api.setDatasource(dataSource);
+    console.log("Rowdata :" + dataSource);
+  }
+
+
+  private paginate(limit: number, offset: number) {
+    this.rowData = [];
+    this.movieService.getMoviesWithLimitAndOffset(limit, offset).subscribe(moviesList => {
+      this.moviesData = moviesList;
+      this.moviesList = this.moviesData["moviesList"];
+      this.rowData = this.moviesList;
+      this.updateGrid();
+    });
+  }
+
+
+  private calculateOffset(currentPage: number, limit: number) {
+    return currentPage * limit;
   }
 
   private createColumnDefs() {
@@ -65,54 +103,47 @@ export class UserGridComponent implements OnInit {
         colIndex: 1
       },
       {
-        headerName: "Name",
-        field: "name",
+        headerName: "Id",
+        field: "id",
         width: 120,
         filter: 'text',
         colIndex: 2
       },
       {
-        headerName: "Username",
-        field: "username",
-        width: 120,
+        headerName: "Name",
+        field: "name",
+        width: 220,
         filter: 'text',
-        colIndex: 3,
-        editable: true
+        colIndex: 3
       },
       {
-        headerName: "Email",
-        field: "email",
+        headerName: "Category",
+        field: "category",
         width: 120,
         filter: 'text',
         colIndex: 4
       },
       {
-        headerName: "Phone",
-        field: "phone",
+        headerName: "Download Date",
+        field: "modifiedDate",
         width: 120,
         filter: 'text',
         colIndex: 5
       },
       {
-        headerName: "Website",
-        field: "website",
-        width: 120,
+        headerName: "Location",
+        field: "absolutePath",
+        width: 420,
         filter: 'text',
         colIndex: 6
       },
-      {
-        headerName: "Address",
-        field: "address",
-        width: 120,
-        filter: 'text',
-        colIndex: 7
-      }
     ];
   }
 
 
   private calculateRowCount() {
     if (this.gridOptions.api && this.rowData) {
+      var offset = this.gridOptions.api.getFirstRenderedRow();
       var model = this.gridOptions.api.getModel();
       var totalRows = this.rowData.length;
       var processedRows = model.getRowCount();
@@ -121,8 +152,8 @@ export class UserGridComponent implements OnInit {
     }
   }
 
-  private onModelUpdated() {
-    console.log('onModelUpdated');
+  private onModelUpdated($event: any) {
+    console.log('onModelUpdated' + $event);
     this.calculateRowCount();
   }
 
@@ -133,6 +164,19 @@ export class UserGridComponent implements OnInit {
 
   private onCellClicked($event: any) {
     console.log('onCellClicked: ' + $event.rowIndex + ' ' + $event.colDef.field);
+    if ($event.column.colId.length > 0 && $event.column.colId.includes("options.")) {
+      this.onOptionSelected($event);
+    }
+  }
+
+  private onOptionSelected($event: any) {
+    var option = $event.column.colId.split(".")[1].toUpperCase();
+    this.selectedOptions[$event.rowIndex] = option;
+    this.rowData[$event.rowIndex]["optionSelected"] = option;
+    // this.gridOptions.api.setRowData(this.rowData);
+    this.gridOptions.api.refreshView();
+    console.log("Option selected:" + option);
+    console.log(this.selectedOptions);
   }
 
   private onCellValueChanged($event: any) {
@@ -149,6 +193,9 @@ export class UserGridComponent implements OnInit {
 
   private onCellFocused($event: any) {
     console.log('onCellFocused: (' + $event.rowIndex + ',' + $event.column.colId + ')');
+    if ($event.column.colId.length > 0 && $event.column.colId.includes("options.")) {
+      this.onOptionSelected($event);
+    }
   }
 
   private onRowSelected($event: any) {
@@ -187,7 +234,7 @@ export class UserGridComponent implements OnInit {
   }
 
   private onRowClicked($event: any) {
-    console.log('onRowClicked: ' + $event.node.data.name);
+    console.log('onRowClicked: ' + $event.rowIndex);
   }
 
   public onQuickFilterChanged($event: any) {
@@ -213,20 +260,30 @@ export class UserGridComponent implements OnInit {
     console.log('cellEditingStarted');
   }
 
+  /*********************** Pagination call  *******/
+  private onPaginationGoToNextPage($event: any) {
+    console.log('onPaginationGoToNextPage');
+  }
+
+  private onPaginationGoToPreviousPage($event: any) {
+    console.log('onPaginationGoToPreviousPage');
+  }
+
+  private onPaginationGoToLastPage($event: any) {
+    console.log('onPaginationGoToLastPage');
+  }
+
+  private onPaginationGetCurrentPage($event: any) {
+    console.log('onPaginationGetCurrentPage');
+  }
+
+  private onPaginationGetRowCount($event: any) {
+    console.log('onPaginationGetRowCount');
+  }
+
   private onCellEditingStopped($event: any) {
     console.log('cellEditingStopped');
   }
-
-
-}
-
-
-
-//Utility function used to pad the date formatting.
-function pad(num: any, totalStringSize: any) {
-  let asString = num + "";
-  while (asString.length < totalStringSize) asString = "0" + asString;
-  return asString;
 }
 
 

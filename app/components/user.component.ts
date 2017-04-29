@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
 import {PostsService} from "../services/posts.service";
-import {User, Post} from "./interface/user.interface";
+import {Post, User} from "./interface/user.interface";
 @Component({
   moduleId: module.id,
   selector: 'user',
@@ -29,11 +29,11 @@ export class UserComponent {
     this.showHobbies = !this.showHobbies;
   }
 
-  addHobby(hobby) {
+  addHobby(hobby: any) {
     this.hobbies.push(hobby);
   }
 
-  deleteHobby(i) {
-    this.hobbies.splice(i, 1);
+  deleteHobby(hobby: any) {
+    this.hobbies.splice(hobby, 1);
   }
 }

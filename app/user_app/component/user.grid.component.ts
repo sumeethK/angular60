@@ -1,14 +1,15 @@
-import {Component, OnInit} from "@angular/core";
-import {User, Address} from "./interface/user.interface";
+import {Component, NgModule, OnInit} from "@angular/core";
+import {Address, User} from "./interface/user.interface";
 import {AgGridNg2} from "ag-grid-ng2/main";
 import {GridOptions} from "ag-grid";
 import {PostsService} from "../../services/posts.service";
 
-
+@NgModule({
+  declarations: [AgGridNg2]
+})
 @Component({
   moduleId: module.id,
   selector: 'usergrid',
-  directives: [AgGridNg2],
   templateUrl: './views/user.grid.html',
   providers: [PostsService]
 })
@@ -131,27 +132,27 @@ export class UserGridComponent implements OnInit {
     this.calculateRowCount();
   }
 
-  private onCellClicked($event) {
+  private onCellClicked($event: any) {
     console.log('onCellClicked: ' + $event.rowIndex + ' ' + $event.colDef.field);
   }
 
-  private onCellValueChanged($event) {
+  private onCellValueChanged($event: any) {
     console.log('onCellValueChanged: ' + $event.oldValue + ' to ' + $event.newValue);
   }
 
-  private onCellDoubleClicked($event) {
+  private onCellDoubleClicked($event: any) {
     console.log('onCellDoubleClicked: ' + $event.rowIndex + ' ' + $event.colDef.field);
   }
 
-  private onCellContextMenu($event) {
+  private onCellContextMenu($event: any) {
     console.log('onCellContextMenu: ' + $event.rowIndex + ' ' + $event.colDef.field);
   }
 
-  private onCellFocused($event) {
+  private onCellFocused($event: any) {
     console.log('onCellFocused: (' + $event.rowIndex + ',' + $event.column.colId + ')');
   }
 
-  private onRowSelected($event) {
+  private onRowSelected($event: any) {
     // taking out, as when we 'select all', it prints to much to the console!!
     // console.log('onRowSelected: ' + $event.node.data.name);
   }
@@ -180,40 +181,40 @@ export class UserGridComponent implements OnInit {
     console.log('onAfterSortChanged');
   }
 
-  private onVirtualRowRemoved($event) {
+  private onVirtualRowRemoved($event: any) {
     // because this event gets fired LOTS of times, we don't print it to the
     // console. if you want to see it, just uncomment out this line
     // console.log('onVirtualRowRemoved: ' + $event.rowIndex);
   }
 
-  private onRowClicked($event) {
+  private onRowClicked($event: any) {
     console.log('onRowClicked: ' + $event.node.data.name);
   }
 
-  public onQuickFilterChanged($event) {
+  public onQuickFilterChanged($event: any) {
     this.gridOptions.api.setQuickFilter($event.target.value);
   }
 
   // here we use one generic event to handle all the column type events.
   // the method just prints the event name
-  private onColumnEvent($event) {
+  private onColumnEvent($event: any) {
     console.log('onColumnEvent: ' + $event);
   }
 
 //Editing
-  private onRowEditingStarted(event) {
+  private onRowEditingStarted($event: any) {
     console.log('never called - not doing row editing');
   }
 
-  private onRowEditingStopped(event) {
+  private onRowEditingStopped($event: any) {
     console.log('never called - not doing row editing');
   }
 
-  private onCellEditingStarted(event) {
+  private onCellEditingStarted($event: any) {
     console.log('cellEditingStarted');
   }
 
-  private onCellEditingStopped(event) {
+  private onCellEditingStopped($event: any) {
     console.log('cellEditingStopped');
   }
 
@@ -232,7 +233,7 @@ function createRandomPhoneNumber() {
   return result;
 }
 
-function addressRender(address) {
+function addressRender(address: any) {
   return "Street : " + address.data.address.street + "\n" +
   "City : " + address.data.address.city + "\n" +
   "Suite : " + address.data.address.suite + "\n",
@@ -240,7 +241,7 @@ function addressRender(address) {
   "Lat : " + address.data.address.geo.lat + "\n";
 }
 
-function percentCellRenderer(params) {
+function percentCellRenderer(params: any) {
   var value = params.value;
 
   var eDivPercentBar = document.createElement('div');
@@ -264,13 +265,6 @@ function percentCellRenderer(params) {
   eOuterDiv.appendChild(eDivPercentBar);
 
   return eOuterDiv;
-}
-
-//Utility function used to pad the date formatting.
-function pad(num, totalStringSize) {
-  let asString = num + "";
-  while (asString.length < totalStringSize) asString = "0" + asString;
-  return asString;
 }
 
 

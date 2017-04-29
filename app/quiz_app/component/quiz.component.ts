@@ -1,13 +1,14 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, NgModule, OnInit} from "@angular/core";
 import {AgGridNg2} from "ag-grid-ng2/main";
 import {GridOptions} from "ag-grid";
 import {QuizService} from "../../services/quiz.service";
 declare let $: any;
-
+@NgModule({
+  declarations: [AgGridNg2]
+})
 @Component({
   moduleId: module.id,
   selector: 'quizgrid',
-  directives: [AgGridNg2],
   templateUrl: './views/quiz.grid.html',
   providers: [QuizService]
 })
@@ -50,7 +51,7 @@ export class QuizGridComponent implements OnInit {
       this.rowData = this.questions;
       this.rowData = addDefaultSelectedOption(this.rowData);
       this.answerCode = fetchAnswer(this.rowData);
-      var dataSource = {
+      let dataSource = {
         paginationPageSize: 10,
         overflowSize: 100,
         getRows: (params: any) => {
@@ -123,7 +124,7 @@ export class QuizGridComponent implements OnInit {
     ];
   }
 
-  private changeRowColor(param) {
+  private changeRowColor(param: any) {
     if (param.node.data[4] === 100) {
       return {'background-color': 'yellow'};
     }
@@ -131,9 +132,9 @@ export class QuizGridComponent implements OnInit {
 
   private calculateRowCount() {
     if (this.gridOptions.api && this.rowData) {
-      var model = this.gridOptions.api.getModel();
-      var totalRows = this.rowData.length;
-      var processedRows = model.getRowCount();
+      let model = this.gridOptions.api.getModel();
+      let totalRows = this.rowData.length;
+      let processedRows = model.getRowCount();
       this.rowCount = processedRows.toLocaleString() + ' / ' + totalRows.toLocaleString();
       console.log("Row updated :" + this.rowCount);
     }
@@ -149,15 +150,15 @@ export class QuizGridComponent implements OnInit {
     this.calculateRowCount();
   }
 
-  private onCellClicked($event) {
+  private onCellClicked($event: any) {
     console.log('onCellClicked: ' + $event.rowIndex + ' ' + $event.colDef.field);
     if ($event.column.colId.length > 0 && $event.column.colId.includes("options.")) {
       this.onOptionSelected($event);
     }
   }
 
-  private onOptionSelected($event) {
-    var option = $event.column.colId.split(".")[1].toUpperCase();
+  private onOptionSelected($event: any) {
+    let option = $event.column.colId.split(".")[1].toUpperCase();
     this.selectedOptions[$event.rowIndex] = option;
     this.rowData[$event.rowIndex]["optionSelected"] = option;
     // this.gridOptions.api.setRowData(this.rowData);
@@ -166,26 +167,26 @@ export class QuizGridComponent implements OnInit {
     console.log(this.selectedOptions);
   }
 
-  private onCellValueChanged($event) {
+  private onCellValueChanged($event: any) {
     console.log('onCellValueChanged: ' + $event.oldValue + ' to ' + $event.newValue);
   }
 
-  private onCellDoubleClicked($event) {
+  private onCellDoubleClicked($event: any) {
     console.log('onCellDoubleClicked: ' + $event.rowIndex + ' ' + $event.colDef.field);
   }
 
-  private onCellContextMenu($event) {
+  private onCellContextMenu($event: any) {
     console.log('onCellContextMenu: ' + $event.rowIndex + ' ' + $event.colDef.field);
   }
 
-  private onCellFocused($event) {
+  private onCellFocused($event: any) {
     console.log('onCellFocused: (' + $event.rowIndex + ',' + $event.column.colId + ')');
     if ($event.column.colId.length > 0 && $event.column.colId.includes("options.")) {
       this.onOptionSelected($event);
     }
   }
 
-  private onRowSelected($event) {
+  private onRowSelected($event: any) {
     // taking out, as when we 'select all', it prints to much to the console!!
     // console.log('onRowSelected: ' + $event.node.data.name);
   }
@@ -214,52 +215,52 @@ export class QuizGridComponent implements OnInit {
     console.log('onAfterSortChanged');
   }
 
-  private onVirtualRowRemoved($event) {
+  private onVirtualRowRemoved($event: any) {
     // because this event gets fired LOTS of times, we don't print it to the
     // console. if you want to see it, just uncomment out this line
     // console.log('onVirtualRowRemoved: ' + $event.rowIndex);
   }
 
-  private onRowClicked($event) {
+  private onRowClicked($event: any) {
     console.log('onRowClicked: ' + $event.rowIndex);
   }
 
-  public onQuickFilterChanged($event) {
+  public onQuickFilterChanged($event: any) {
     this.gridOptions.api.setQuickFilter($event.target.value);
   }
 
   // here we use one generic event to handle all the column type events.
   // the method just prints the event name
-  private onColumnEvent($event) {
+  private onColumnEvent($event: any) {
     console.log('onColumnEvent: ' + $event);
   }
 
 //Editing
-  private onRowEditingStarted(event) {
+  private onRowEditingStarted($event: any) {
     console.log('never called - not doing row editing');
   }
 
-  private onRowEditingStopped(event) {
+  private onRowEditingStopped($event: any) {
     console.log('never called - not doing row editing');
   }
 
-  private onCellEditingStarted(event) {
+  private onCellEditingStarted($event: any) {
     console.log('cellEditingStarted');
   }
 
-  private onCellEditingStopped(event) {
+  private onCellEditingStopped($event: any) {
     console.log('cellEditingStopped');
   }
 
   public validateAnswer() {
     console.log("validation");
-    var dataSelectedOptions = this.selectedOptions;
-    var countCorrectAnswer = 0;
+    let dataSelectedOptions = this.selectedOptions;
+    let countCorrectAnswer = 0;
     if (dataSelectedOptions.length > 0) {
-      var localGrid = this.gridOptions;
+      let localGrid = this.gridOptions;
 
-      var dataAnswerCode = this.answerCode;
-      $.each(dataSelectedOptions, function (index, value) {
+      let dataAnswerCode = this.answerCode;
+      $.each(dataSelectedOptions, function (index: any, value: any) {
         if (dataSelectedOptions[index] == dataAnswerCode[index]) {
           countCorrectAnswer++;
         }
@@ -273,8 +274,8 @@ export class QuizGridComponent implements OnInit {
 
 
 function createRandomPhoneNumber() {
-  var result = '+';
-  for (var i = 0; i < 12; i++) {
+  let result = '+';
+  for (let i = 0; i < 12; i++) {
     result += Math.round(Math.random() * 10);
     if (i === 2 || i === 5 || i === 8) {
       result += ' ';
@@ -288,10 +289,10 @@ function createRandomPhoneNumber() {
 //   return "Street : " + address.data.address.street + "\n" +
 // }
 
-function percentCellRenderer(params) {
-  var value = params.value;
+function percentCellRenderer(params: any) {
+  let value = params.value;
 
-  var eDivPercentBar = document.createElement('div');
+  let eDivPercentBar = document.createElement('div');
   eDivPercentBar.className = 'div-percent-bar';
   eDivPercentBar.style.width = value + '%';
   if (value < 20) {
@@ -302,11 +303,11 @@ function percentCellRenderer(params) {
     eDivPercentBar.style.backgroundColor = '#00A000';
   }
 
-  var eValue = document.createElement('div');
+  let eValue = document.createElement('div');
   eValue.className = 'div-percent-value';
   eValue.innerHTML = value + '%';
 
-  var eOuterDiv = document.createElement('div');
+  let eOuterDiv = document.createElement('div');
   eOuterDiv.className = 'div-outer-div';
   eOuterDiv.appendChild(eValue);
   eOuterDiv.appendChild(eDivPercentBar);
@@ -314,18 +315,18 @@ function percentCellRenderer(params) {
   return eOuterDiv;
 }
 
-function addDefaultSelectedOption(data) {
-  // var option = ["A","B","C","D"]
-  $.each(data, function (index, value) {
-    // var random= Math.floor((Math.random()*option.length))
+function addDefaultSelectedOption(data: any) {
+  // let option = ["A","B","C","D"]
+  $.each(data, function (index: any) {
+    // let random= Math.floor((Math.random()*option.length))
     data[index]["optionSelected"] = "None";
     console.log(data[index]["optionSelected"]);
   });
   return data;
 }
-function fetchAnswer(data) {
-  var answerCode = [];
-  $.each(data, function (index, value) {
+function fetchAnswer(data: any) {
+  let answerCode: any = [];
+  $.each(data, function (index: any) {
     answerCode[index] = data[index]["answer"]["key"];
   });
   console.log("AnswerCode:" + answerCode);
